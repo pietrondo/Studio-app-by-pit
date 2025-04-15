@@ -1,0 +1,15 @@
+C:\Users\pietr\progetti\app-studio\Studio\obj\Debug\net9.0-windows\Studio.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\pietr\progetti\app-studio\Studio\obj\Debug\net9.0-windows\Studio.AssemblyInfoInputs.cache
+C:\Users\pietr\progetti\app-studio\Studio\obj\Debug\net9.0-windows\Studio.AssemblyInfo.cs
+C:\Users\pietr\progetti\app-studio\Studio\obj\Debug\net9.0-windows\Studio.csproj.CoreCompileInputs.cache
+C:\Users\pietr\progetti\app-studio\Studio\obj\Debug\net9.0-windows\Studio.sourcelink.json
+C:\Users\pietr\progetti\app-studio\Studio\bin\Debug\net9.0-windows\Studio.exe
+C:\Users\pietr\progetti\app-studio\Studio\bin\Debug\net9.0-windows\Studio.deps.json
+C:\Users\pietr\progetti\app-studio\Studio\bin\Debug\net9.0-windows\Studio.runtimeconfig.json
+C:\Users\pietr\progetti\app-studio\Studio\bin\Debug\net9.0-windows\Studio.dll
+C:\Users\pietr\progetti\app-studio\Studio\bin\Debug\net9.0-windows\Studio.pdb
+C:\Users\pietr\progetti\app-studio\Studio\obj\Debug\net9.0-windows\Studio.dll
+C:\Users\pietr\progetti\app-studio\Studio\obj\Debug\net9.0-windows\refint\Studio.dll
+C:\Users\pietr\progetti\app-studio\Studio\obj\Debug\net9.0-windows\Studio.pdb
+C:\Users\pietr\progetti\app-studio\Studio\obj\Debug\net9.0-windows\Studio.genruntimeconfig.cache
+C:\Users\pietr\progetti\app-studio\Studio\obj\Debug\net9.0-windows\ref\Studio.dll

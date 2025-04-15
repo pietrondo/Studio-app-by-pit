@@ -560,16 +560,162 @@ namespace Studio
         // Implementazione dei metodi per il modulo Esami
         private void AddExam()
         {
-            // TODO: Implementare form per l'aggiunta di un esame
-            MessageBox.Show("Funzionalità di aggiunta esame da implementare");
+            // Creazione del form per l'aggiunta di un esame
+            Form examForm = new Form
+            {
+                Text = "Aggiungi Esame",
+                Size = new Size(400, 300),
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                StartPosition = FormStartPosition.CenterParent,
+                MaximizeBox = false,
+                MinimizeBox = false
+            };
+
+            // Materia
+            Label subjectLabel = new Label { Text = "Materia:", Location = new Point(20, 20) };
+            TextBox subjectTextBox = new TextBox { Location = new Point(120, 20), Width = 240 };
+            
+            // Data dell'esame
+            Label examDateLabel = new Label { Text = "Data Esame:", Location = new Point(20, 60) };
+            DateTimePicker examDatePicker = new DateTimePicker { Location = new Point(120, 60), Width = 240 };
+            
+            // Luogo
+            Label locationLabel = new Label { Text = "Luogo:", Location = new Point(20, 100) };
+            TextBox locationTextBox = new TextBox { Location = new Point(120, 100), Width = 240 };
+            
+            // Pulsanti
+            Button saveButton = new Button
+            {
+                Text = "Salva",
+                Location = new Point(120, 200),
+                DialogResult = DialogResult.OK
+            };
+            
+            Button cancelButton = new Button
+            {
+                Text = "Annulla",
+                Location = new Point(230, 200),
+                DialogResult = DialogResult.Cancel
+            };
+            
+            // Aggiunta dei controlli al form
+            examForm.Controls.AddRange(new Control[] { 
+                subjectLabel, subjectTextBox, 
+                examDateLabel, examDatePicker, 
+                locationLabel, locationTextBox,
+                saveButton, cancelButton 
+            });
+            
+            examForm.AcceptButton = saveButton;
+            examForm.CancelButton = cancelButton;
+            
+            // Gestione del risultato del form
+            if (examForm.ShowDialog() == DialogResult.OK)
+            {
+                string subject = subjectTextBox.Text.Trim();
+                DateTime examDate = examDatePicker.Value;
+                string location = locationTextBox.Text.Trim();
+                
+                if (!string.IsNullOrEmpty(subject))
+                {
+                    _examManager.AddExam(subject, examDate, location);
+                    RefreshExamData((DataGridView)this.Controls.Find("examGridView", true)[0]);
+                }
+                else
+                {
+                    MessageBox.Show("Il nome della materia non può essere vuoto.", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
         
         private void EditExam(DataGridView grid)
         {
             if (grid.SelectedRows.Count > 0)
             {
-                // TODO: Implementare form per la modifica di un esame
-                MessageBox.Show("Funzionalità di modifica esame da implementare");
+                // Ottiene l'esame selezionato
+                int examId = (int)grid.SelectedRows[0].Cells["Id"].Value;
+                string currentSubject = grid.SelectedRows[0].Cells["Subject"].Value.ToString();
+                DateTime currentExamDate = (DateTime)grid.SelectedRows[0].Cells["ExamDate"].Value;
+                string currentLocation = grid.SelectedRows[0].Cells["Location"].Value.ToString();
+                
+                // Creazione del form per la modifica
+                Form examForm = new Form
+                {
+                    Text = "Modifica Esame",
+                    Size = new Size(400, 300),
+                    FormBorderStyle = FormBorderStyle.FixedDialog,
+                    StartPosition = FormStartPosition.CenterParent,
+                    MaximizeBox = false,
+                    MinimizeBox = false
+                };
+                
+                // Materia
+                Label subjectLabel = new Label { Text = "Materia:", Location = new Point(20, 20) };
+                TextBox subjectTextBox = new TextBox { 
+                    Location = new Point(120, 20), 
+                    Width = 240,
+                    Text = currentSubject
+                };
+                
+                // Data dell'esame
+                Label examDateLabel = new Label { Text = "Data Esame:", Location = new Point(20, 60) };
+                DateTimePicker examDatePicker = new DateTimePicker { 
+                    Location = new Point(120, 60), 
+                    Width = 240,
+                    Value = currentExamDate
+                };
+                
+                // Luogo
+                Label locationLabel = new Label { Text = "Luogo:", Location = new Point(20, 100) };
+                TextBox locationTextBox = new TextBox { 
+                    Location = new Point(120, 100), 
+                    Width = 240,
+                    Text = currentLocation
+                };
+                
+                // Pulsanti
+                Button saveButton = new Button
+                {
+                    Text = "Salva",
+                    Location = new Point(120, 200),
+                    DialogResult = DialogResult.OK
+                };
+                
+                Button cancelButton = new Button
+                {
+                    Text = "Annulla",
+                    Location = new Point(230, 200),
+                    DialogResult = DialogResult.Cancel
+                };
+                
+                // Aggiunta dei controlli al form
+                examForm.Controls.AddRange(new Control[] { 
+                    subjectLabel, subjectTextBox, 
+                    examDateLabel, examDatePicker, 
+                    locationLabel, locationTextBox,
+                    saveButton, cancelButton 
+                });
+                
+                examForm.AcceptButton = saveButton;
+                examForm.CancelButton = cancelButton;
+                
+                // Gestione del risultato del form
+                if (examForm.ShowDialog() == DialogResult.OK)
+                {
+                    string subject = subjectTextBox.Text.Trim();
+                    DateTime examDate = examDatePicker.Value;
+                    string location = locationTextBox.Text.Trim();
+                    
+                    if (!string.IsNullOrEmpty(subject))
+                    {
+                        _examManager.EditExam(examId, subject, examDate, location);
+                        RefreshExamData(grid);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Il nome della materia non può essere vuoto.", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
             }
             else
             {
@@ -599,12 +745,82 @@ namespace Studio
         {
             if (grid.SelectedRows.Count > 0)
             {
-                // TODO: Implementare form per la registrazione del risultato di un esame
-                MessageBox.Show("Funzionalità di registrazione risultato da implementare");
+                int examId = (int)grid.SelectedRows[0].Cells["Id"].Value;
+                string subject = grid.SelectedRows[0].Cells["Subject"].Value.ToString();
+                
+                // Creazione del form per la registrazione del risultato
+                Form resultForm = new Form
+                {
+                    Text = $"Registra Risultato: {subject}",
+                    Size = new Size(350, 250),
+                    FormBorderStyle = FormBorderStyle.FixedDialog,
+                    StartPosition = FormStartPosition.CenterParent,
+                    MaximizeBox = false,
+                    MinimizeBox = false
+                };
+                
+                // Superato
+                Label passedLabel = new Label { Text = "Superato:", Location = new Point(20, 20) };
+                CheckBox passedCheckBox = new CheckBox { 
+                    Location = new Point(120, 20), 
+                    Width = 20,
+                    Checked = false
+                };
+                
+                // Voto
+                Label scoreLabel = new Label { Text = "Voto (0-30):", Location = new Point(20, 60) };
+                NumericUpDown scoreNumeric = new NumericUpDown { 
+                    Location = new Point(120, 60), 
+                    Width = 60,
+                    Minimum = 0,
+                    Maximum = 30,
+                    Value = 18,
+                    Enabled = false  // Disabilitato inizialmente
+                };
+                
+                // Abilita il campo del voto solo se l'esame è stato superato
+                passedCheckBox.CheckedChanged += (sender, e) => {
+                    scoreNumeric.Enabled = passedCheckBox.Checked;
+                };
+                
+                // Pulsanti
+                Button saveButton = new Button
+                {
+                    Text = "Salva",
+                    Location = new Point(80, 150),
+                    DialogResult = DialogResult.OK
+                };
+                
+                Button cancelButton = new Button
+                {
+                    Text = "Annulla",
+                    Location = new Point(180, 150),
+                    DialogResult = DialogResult.Cancel
+                };
+                
+                // Aggiunta dei controlli al form
+                resultForm.Controls.AddRange(new Control[] { 
+                    passedLabel, passedCheckBox, 
+                    scoreLabel, scoreNumeric,
+                    saveButton, cancelButton 
+                });
+                
+                resultForm.AcceptButton = saveButton;
+                resultForm.CancelButton = cancelButton;
+                
+                // Gestione del risultato del form
+                if (resultForm.ShowDialog() == DialogResult.OK)
+                {
+                    bool isPassed = passedCheckBox.Checked;
+                    int? score = isPassed ? (int?)scoreNumeric.Value : null;
+                    
+                    _examManager.RecordExamResult(examId, isPassed, score);
+                    RefreshExamData(grid);
+                }
             }
             else
             {
-                MessageBox.Show("Seleziona un esame per registrare il risultato");
+                MessageBox.Show("Seleziona un esame per registrare il risultato", "Attenzione", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
         
@@ -617,16 +833,162 @@ namespace Studio
         // Implementazione dei metodi per il modulo Libri
         private void AddBook()
         {
-            // TODO: Implementare form per l'aggiunta di un libro
-            MessageBox.Show("Funzionalità di aggiunta libro da implementare");
+            // Creazione del form per l'aggiunta di un libro
+            Form bookForm = new Form
+            {
+                Text = "Aggiungi Libro",
+                Size = new Size(400, 300),
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                StartPosition = FormStartPosition.CenterParent,
+                MaximizeBox = false,
+                MinimizeBox = false
+            };
+
+            // Titolo
+            Label titleLabel = new Label { Text = "Titolo:", Location = new Point(20, 20) };
+            TextBox titleTextBox = new TextBox { Location = new Point(120, 20), Width = 240 };
+            
+            // Autore
+            Label authorLabel = new Label { Text = "Autore:", Location = new Point(20, 60) };
+            TextBox authorTextBox = new TextBox { Location = new Point(120, 60), Width = 240 };
+            
+            // Data inizio lettura
+            Label startDateLabel = new Label { Text = "Data Inizio:", Location = new Point(20, 100) };
+            DateTimePicker startDatePicker = new DateTimePicker { Location = new Point(120, 100), Width = 240 };
+            
+            // Pulsanti
+            Button saveButton = new Button
+            {
+                Text = "Salva",
+                Location = new Point(120, 200),
+                DialogResult = DialogResult.OK
+            };
+            
+            Button cancelButton = new Button
+            {
+                Text = "Annulla",
+                Location = new Point(230, 200),
+                DialogResult = DialogResult.Cancel
+            };
+            
+            // Aggiunta dei controlli al form
+            bookForm.Controls.AddRange(new Control[] { 
+                titleLabel, titleTextBox, 
+                authorLabel, authorTextBox, 
+                startDateLabel, startDatePicker,
+                saveButton, cancelButton 
+            });
+            
+            bookForm.AcceptButton = saveButton;
+            bookForm.CancelButton = cancelButton;
+            
+            // Gestione del risultato del form
+            if (bookForm.ShowDialog() == DialogResult.OK)
+            {
+                string title = titleTextBox.Text.Trim();
+                string author = authorTextBox.Text.Trim();
+                DateTime startDate = startDatePicker.Value;
+                
+                if (!string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(author))
+                {
+                    _bookTracker.AddBook(title, author, startDate);
+                    RefreshBookData((DataGridView)this.Controls.Find("bookGridView", true)[0]);
+                }
+                else
+                {
+                    MessageBox.Show("Titolo e autore non possono essere vuoti.", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
         
         private void EditBook(DataGridView grid)
         {
             if (grid.SelectedRows.Count > 0)
             {
-                // TODO: Implementare form per la modifica di un libro
-                MessageBox.Show("Funzionalità di modifica libro da implementare");
+                // Ottiene il libro selezionato
+                int bookId = (int)grid.SelectedRows[0].Cells["Id"].Value;
+                string currentTitle = grid.SelectedRows[0].Cells["Title"].Value.ToString();
+                string currentAuthor = grid.SelectedRows[0].Cells["Author"].Value.ToString();
+                DateTime currentStartDate = (DateTime)grid.SelectedRows[0].Cells["StartDate"].Value;
+                
+                // Creazione del form per la modifica
+                Form bookForm = new Form
+                {
+                    Text = "Modifica Libro",
+                    Size = new Size(400, 300),
+                    FormBorderStyle = FormBorderStyle.FixedDialog,
+                    StartPosition = FormStartPosition.CenterParent,
+                    MaximizeBox = false,
+                    MinimizeBox = false
+                };
+                
+                // Titolo
+                Label titleLabel = new Label { Text = "Titolo:", Location = new Point(20, 20) };
+                TextBox titleTextBox = new TextBox { 
+                    Location = new Point(120, 20), 
+                    Width = 240,
+                    Text = currentTitle
+                };
+                
+                // Autore
+                Label authorLabel = new Label { Text = "Autore:", Location = new Point(20, 60) };
+                TextBox authorTextBox = new TextBox { 
+                    Location = new Point(120, 60), 
+                    Width = 240,
+                    Text = currentAuthor
+                };
+                
+                // Data inizio lettura
+                Label startDateLabel = new Label { Text = "Data Inizio:", Location = new Point(20, 100) };
+                DateTimePicker startDatePicker = new DateTimePicker { 
+                    Location = new Point(120, 100), 
+                    Width = 240,
+                    Value = currentStartDate
+                };
+                
+                // Pulsanti
+                Button saveButton = new Button
+                {
+                    Text = "Salva",
+                    Location = new Point(120, 200),
+                    DialogResult = DialogResult.OK
+                };
+                
+                Button cancelButton = new Button
+                {
+                    Text = "Annulla",
+                    Location = new Point(230, 200),
+                    DialogResult = DialogResult.Cancel
+                };
+                
+                // Aggiunta dei controlli al form
+                bookForm.Controls.AddRange(new Control[] { 
+                    titleLabel, titleTextBox, 
+                    authorLabel, authorTextBox, 
+                    startDateLabel, startDatePicker,
+                    saveButton, cancelButton 
+                });
+                
+                bookForm.AcceptButton = saveButton;
+                bookForm.CancelButton = cancelButton;
+                
+                // Gestione del risultato del form
+                if (bookForm.ShowDialog() == DialogResult.OK)
+                {
+                    string title = titleTextBox.Text.Trim();
+                    string author = authorTextBox.Text.Trim();
+                    DateTime startDate = startDatePicker.Value;
+                    
+                    if (!string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(author))
+                    {
+                        _bookTracker.EditBook(bookId, title, author, startDate);
+                        RefreshBookData(grid);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Titolo e autore non possono essere vuoti.", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
             }
             else
             {
@@ -656,12 +1018,86 @@ namespace Studio
         {
             if (grid.SelectedRows.Count > 0)
             {
-                // TODO: Implementare form per segnare un libro come completato
-                MessageBox.Show("Funzionalità di completamento libro da implementare");
+                int bookId = (int)grid.SelectedRows[0].Cells["Id"].Value;
+                string title = grid.SelectedRows[0].Cells["Title"].Value.ToString();
+                
+                // Creazione del form per segnare un libro come completato
+                Form completeForm = new Form
+                {
+                    Text = $"Completa Libro: {title}",
+                    Size = new Size(400, 350),
+                    FormBorderStyle = FormBorderStyle.FixedDialog,
+                    StartPosition = FormStartPosition.CenterParent,
+                    MaximizeBox = false,
+                    MinimizeBox = false
+                };
+                
+                // Data completamento
+                Label completionDateLabel = new Label { Text = "Data Completamento:", Location = new Point(20, 20) };
+                DateTimePicker completionDatePicker = new DateTimePicker { 
+                    Location = new Point(150, 20), 
+                    Width = 210
+                };
+                
+                // Valutazione
+                Label ratingLabel = new Label { Text = "Valutazione (1-5):", Location = new Point(20, 60) };
+                NumericUpDown ratingNumeric = new NumericUpDown { 
+                    Location = new Point(150, 60), 
+                    Width = 60,
+                    Minimum = 1,
+                    Maximum = 5,
+                    Value = 3
+                };
+                
+                // Note
+                Label notesLabel = new Label { Text = "Note:", Location = new Point(20, 100) };
+                TextBox notesTextBox = new TextBox { 
+                    Location = new Point(150, 100), 
+                    Width = 210,
+                    Height = 100,
+                    Multiline = true
+                };
+                
+                // Pulsanti
+                Button saveButton = new Button
+                {
+                    Text = "Salva",
+                    Location = new Point(120, 250),
+                    DialogResult = DialogResult.OK
+                };
+                
+                Button cancelButton = new Button
+                {
+                    Text = "Annulla",
+                    Location = new Point(230, 250),
+                    DialogResult = DialogResult.Cancel
+                };
+                
+                // Aggiunta dei controlli al form
+                completeForm.Controls.AddRange(new Control[] { 
+                    completionDateLabel, completionDatePicker, 
+                    ratingLabel, ratingNumeric,
+                    notesLabel, notesTextBox,
+                    saveButton, cancelButton 
+                });
+                
+                completeForm.AcceptButton = saveButton;
+                completeForm.CancelButton = cancelButton;
+                
+                // Gestione del risultato del form
+                if (completeForm.ShowDialog() == DialogResult.OK)
+                {
+                    DateTime completionDate = completionDatePicker.Value;
+                    int rating = (int)ratingNumeric.Value;
+                    string notes = notesTextBox.Text.Trim();
+                    
+                    _bookTracker.CompleteBook(bookId, completionDate, rating, notes);
+                    RefreshBookData(grid);
+                }
             }
             else
             {
-                MessageBox.Show("Seleziona un libro da completare");
+                MessageBox.Show("Seleziona un libro da completare", "Attenzione", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
         

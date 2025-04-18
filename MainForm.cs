@@ -406,28 +406,58 @@ namespace Studio
             {
                 string description = descTextBox.Text.Trim();
                 DateTime dueDate = dueDatePicker.Value;
-                Priority priority = (Priority)Enum.Parse(typeof(Priority), priorityComboBox.SelectedItem.ToString());
+                string? selectedItem = priorityComboBox.SelectedItem?.ToString();
                 
-                if (!string.IsNullOrEmpty(description))
+                if (!string.IsNullOrEmpty(description) && selectedItem != null)
                 {
+                    Priority priority = (Priority)Enum.Parse(typeof(Priority), selectedItem);
                     _taskManager.AddTask(description, dueDate, priority);
+                    
+                    // Aggiorna tutte le griglie delle task
+                    foreach (Control control in Controls)
+                    {
+                        if (control is TabControl tabControl)
+                        {
+                            foreach (TabPage tabPage in tabControl.TabPages)
+                            {
+                                foreach (Control tabPageControl in tabPage.Controls)
+                                {
+                                    if (tabPageControl is DataGridView grid && tabPage.Text.Contains("Task"))
+                                    {
+                                        RefreshTaskData(grid);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
                 else
                 {
-                    MessageBox.Show("La descrizione non può essere vuota.", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("La descrizione non può essere vuota e devi selezionare una priorità.", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
         
         private void EditTask(DataGridView grid)
         {
-            if (grid.SelectedRows.Count > 0)
+            if (grid?.SelectedRows.Count > 0)
             {
-                // Ottiene la task selezionata
-                int taskId = (int)grid.SelectedRows[0].Cells["Id"].Value;
-                string currentDescription = grid.SelectedRows[0].Cells["Description"].Value.ToString();
-                DateTime currentDueDate = (DateTime)grid.SelectedRows[0].Cells["DueDate"].Value;
-                Priority currentPriority = (Priority)grid.SelectedRows[0].Cells["Priority"].Value;
+                // Ottieni i valori in modo sicuro
+                var selectedRow = grid.SelectedRows[0];
+                if (selectedRow.Cells["Id"].Value == null || 
+                    selectedRow.Cells["Description"].Value == null || 
+                    selectedRow.Cells["DueDate"].Value == null || 
+                    selectedRow.Cells["Priority"].Value == null)
+                {
+                    MessageBox.Show("Dati della task non validi.", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                
+                int taskId = Convert.ToInt32(selectedRow.Cells["Id"].Value);
+                string currentDescription = Convert.ToString(selectedRow.Cells["Description"].Value) ?? string.Empty;
+                DateTime currentDueDate = Convert.ToDateTime(selectedRow.Cells["DueDate"].Value);
+                Priority currentPriority = (Priority)Convert.ToInt32(selectedRow.Cells["Priority"].Value);
                 
                 // Creazione del form per la modifica
                 Form taskForm = new Form
@@ -500,16 +530,17 @@ namespace Studio
                 {
                     string description = descTextBox.Text.Trim();
                     DateTime dueDate = dueDatePicker.Value;
-                    Priority priority = (Priority)Enum.Parse(typeof(Priority), priorityComboBox.SelectedItem.ToString());
+                    string? selectedItem = priorityComboBox.SelectedItem?.ToString();
                     
-                    if (!string.IsNullOrEmpty(description))
+                    if (!string.IsNullOrEmpty(description) && selectedItem != null)
                     {
+                        Priority priority = (Priority)Enum.Parse(typeof(Priority), selectedItem);
                         _taskManager.EditTask(taskId, description, dueDate, priority);
                         RefreshTaskData(grid);
                     }
                     else
                     {
-                        MessageBox.Show("La descrizione non può essere vuota.", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("La descrizione non può essere vuota e devi selezionare una priorità.", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
@@ -521,9 +552,16 @@ namespace Studio
         
         private void DeleteTask(DataGridView grid)
         {
-            if (grid.SelectedRows.Count > 0)
+            if (grid?.SelectedRows.Count > 0)
             {
-                int taskId = (int)grid.SelectedRows[0].Cells["Id"].Value;
+                var selectedRow = grid.SelectedRows[0];
+                if (selectedRow.Cells["Id"].Value == null)
+                {
+                    MessageBox.Show("ID task non valido.", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                
+                int taskId = Convert.ToInt32(selectedRow.Cells["Id"].Value);
                 var result = MessageBox.Show("Sei sicuro di voler eliminare questa task?", "Conferma eliminazione", MessageBoxButtons.YesNo);
                 if (result == DialogResult.Yes)
                 {
@@ -539,9 +577,16 @@ namespace Studio
         
         private void CompleteTask(DataGridView grid)
         {
-            if (grid.SelectedRows.Count > 0)
+            if (grid?.SelectedRows.Count > 0)
             {
-                int taskId = (int)grid.SelectedRows[0].Cells["Id"].Value;
+                var selectedRow = grid.SelectedRows[0];
+                if (selectedRow.Cells["Id"].Value == null)
+                {
+                    MessageBox.Show("ID task non valido.", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                
+                int taskId = Convert.ToInt32(selectedRow.Cells["Id"].Value);
                 _taskManager.CompleteTask(taskId);
                 RefreshTaskData(grid);
             }
@@ -553,8 +598,11 @@ namespace Studio
         
         private void RefreshTaskData(DataGridView grid)
         {
-            grid.DataSource = null;
-            grid.DataSource = _taskManager.GetAllTasks();
+            if (grid != null)
+            {
+                grid.DataSource = null;
+                grid.DataSource = _taskManager.GetAllTasks();
+            }
         }
         
         // Implementazione dei metodi per il modulo Esami
@@ -619,7 +667,25 @@ namespace Studio
                 if (!string.IsNullOrEmpty(subject))
                 {
                     _examManager.AddExam(subject, examDate, location);
-                    RefreshExamData((DataGridView)this.Controls.Find("examGridView", true)[0]);
+                    
+                    // Aggiorna tutte le griglie degli esami
+                    foreach (Control control in Controls)
+                    {
+                        if (control is TabControl tabControl)
+                        {
+                            foreach (TabPage tabPage in tabControl.TabPages)
+                            {
+                                foreach (Control tabPageControl in tabPage.Controls)
+                                {
+                                    if (tabPageControl is DataGridView grid && tabPage.Text.Contains("Esami"))
+                                    {
+                                        RefreshExamData(grid);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
                 else
                 {
@@ -630,13 +696,23 @@ namespace Studio
         
         private void EditExam(DataGridView grid)
         {
-            if (grid.SelectedRows.Count > 0)
+            if (grid?.SelectedRows.Count > 0)
             {
-                // Ottiene l'esame selezionato
-                int examId = (int)grid.SelectedRows[0].Cells["Id"].Value;
-                string currentSubject = grid.SelectedRows[0].Cells["Subject"].Value.ToString();
-                DateTime currentExamDate = (DateTime)grid.SelectedRows[0].Cells["ExamDate"].Value;
-                string currentLocation = grid.SelectedRows[0].Cells["Location"].Value.ToString();
+                // Ottieni i valori in modo sicuro
+                var selectedRow = grid.SelectedRows[0];
+                if (selectedRow.Cells["Id"].Value == null || 
+                    selectedRow.Cells["Subject"].Value == null || 
+                    selectedRow.Cells["ExamDate"].Value == null || 
+                    selectedRow.Cells["Location"].Value == null)
+                {
+                    MessageBox.Show("Dati dell'esame non validi.", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                
+                int examId = Convert.ToInt32(selectedRow.Cells["Id"].Value);
+                string currentSubject = Convert.ToString(selectedRow.Cells["Subject"].Value) ?? string.Empty;
+                DateTime currentExamDate = Convert.ToDateTime(selectedRow.Cells["ExamDate"].Value);
+                string currentLocation = Convert.ToString(selectedRow.Cells["Location"].Value) ?? string.Empty;
                 
                 // Creazione del form per la modifica
                 Form examForm = new Form
@@ -725,9 +801,16 @@ namespace Studio
         
         private void DeleteExam(DataGridView grid)
         {
-            if (grid.SelectedRows.Count > 0)
+            if (grid?.SelectedRows.Count > 0)
             {
-                int examId = (int)grid.SelectedRows[0].Cells["Id"].Value;
+                var selectedRow = grid.SelectedRows[0];
+                if (selectedRow.Cells["Id"].Value == null)
+                {
+                    MessageBox.Show("ID esame non valido.", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                
+                int examId = Convert.ToInt32(selectedRow.Cells["Id"].Value);
                 var result = MessageBox.Show("Sei sicuro di voler eliminare questo esame?", "Conferma eliminazione", MessageBoxButtons.YesNo);
                 if (result == DialogResult.Yes)
                 {
@@ -743,10 +826,17 @@ namespace Studio
         
         private void RecordExamResult(DataGridView grid)
         {
-            if (grid.SelectedRows.Count > 0)
+            if (grid?.SelectedRows.Count > 0)
             {
-                int examId = (int)grid.SelectedRows[0].Cells["Id"].Value;
-                string subject = grid.SelectedRows[0].Cells["Subject"].Value.ToString();
+                var selectedRow = grid.SelectedRows[0];
+                if (selectedRow.Cells["Id"].Value == null || selectedRow.Cells["Subject"].Value == null)
+                {
+                    MessageBox.Show("Dati dell'esame non validi.", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                
+                int examId = Convert.ToInt32(selectedRow.Cells["Id"].Value);
+                string subject = Convert.ToString(selectedRow.Cells["Subject"].Value) ?? string.Empty;
                 
                 // Creazione del form per la registrazione del risultato
                 Form resultForm = new Form
@@ -826,8 +916,11 @@ namespace Studio
         
         private void RefreshExamData(DataGridView grid)
         {
-            grid.DataSource = null;
-            grid.DataSource = _examManager.GetAllExams();
+            if (grid != null)
+            {
+                grid.DataSource = null;
+                grid.DataSource = _examManager.GetAllExams();
+            }
         }
         
         // Implementazione dei metodi per il modulo Libri
@@ -892,7 +985,25 @@ namespace Studio
                 if (!string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(author))
                 {
                     _bookTracker.AddBook(title, author, startDate);
-                    RefreshBookData((DataGridView)this.Controls.Find("bookGridView", true)[0]);
+                    
+                    // Aggiorna tutte le griglie dei libri
+                    foreach (Control control in Controls)
+                    {
+                        if (control is TabControl tabControl)
+                        {
+                            foreach (TabPage tabPage in tabControl.TabPages)
+                            {
+                                foreach (Control tabPageControl in tabPage.Controls)
+                                {
+                                    if (tabPageControl is DataGridView grid && tabPage.Text.Contains("Libri"))
+                                    {
+                                        RefreshBookData(grid);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
                 else
                 {
@@ -903,13 +1014,24 @@ namespace Studio
         
         private void EditBook(DataGridView grid)
         {
-            if (grid.SelectedRows.Count > 0)
+            if (grid?.SelectedRows.Count > 0)
             {
-                // Ottiene il libro selezionato
-                int bookId = (int)grid.SelectedRows[0].Cells["Id"].Value;
-                string currentTitle = grid.SelectedRows[0].Cells["Title"].Value.ToString();
-                string currentAuthor = grid.SelectedRows[0].Cells["Author"].Value.ToString();
-                DateTime currentStartDate = (DateTime)grid.SelectedRows[0].Cells["StartDate"].Value;
+                // Ottieni i valori in modo sicuro
+                var selectedRow = grid.SelectedRows[0];
+                if (selectedRow.Cells["Id"].Value == null || 
+                    selectedRow.Cells["Title"].Value == null || 
+                    selectedRow.Cells["Author"].Value == null || 
+                    selectedRow.Cells["StartDate"].Value == null)
+                {
+                    MessageBox.Show("Dati del libro non validi.", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                
+                int bookId = Convert.ToInt32(selectedRow.Cells["Id"].Value);
+                // Uso di Convert.ToString invece di .ToString() diretto per gestire i null in modo sicuro
+                string currentTitle = Convert.ToString(selectedRow.Cells["Title"].Value) ?? string.Empty;
+                string currentAuthor = Convert.ToString(selectedRow.Cells["Author"].Value) ?? string.Empty;
+                DateTime currentStartDate = Convert.ToDateTime(selectedRow.Cells["StartDate"].Value);
                 
                 // Creazione del form per la modifica
                 Form bookForm = new Form
@@ -998,9 +1120,16 @@ namespace Studio
         
         private void DeleteBook(DataGridView grid)
         {
-            if (grid.SelectedRows.Count > 0)
+            if (grid?.SelectedRows.Count > 0)
             {
-                int bookId = (int)grid.SelectedRows[0].Cells["Id"].Value;
+                var selectedRow = grid.SelectedRows[0];
+                if (selectedRow.Cells["Id"].Value == null)
+                {
+                    MessageBox.Show("ID libro non valido.", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                
+                int bookId = Convert.ToInt32(selectedRow.Cells["Id"].Value);
                 var result = MessageBox.Show("Sei sicuro di voler eliminare questo libro?", "Conferma eliminazione", MessageBoxButtons.YesNo);
                 if (result == DialogResult.Yes)
                 {
@@ -1016,10 +1145,17 @@ namespace Studio
         
         private void CompleteBook(DataGridView grid)
         {
-            if (grid.SelectedRows.Count > 0)
+            if (grid?.SelectedRows.Count > 0)
             {
-                int bookId = (int)grid.SelectedRows[0].Cells["Id"].Value;
-                string title = grid.SelectedRows[0].Cells["Title"].Value.ToString();
+                var selectedRow = grid.SelectedRows[0];
+                if (selectedRow.Cells["Id"].Value == null || selectedRow.Cells["Title"].Value == null)
+                {
+                    MessageBox.Show("Dati del libro non validi.", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                
+                int bookId = Convert.ToInt32(selectedRow.Cells["Id"].Value);
+                string title = Convert.ToString(selectedRow.Cells["Title"].Value) ?? string.Empty;
                 
                 // Creazione del form per segnare un libro come completato
                 Form completeForm = new Form
@@ -1088,7 +1224,7 @@ namespace Studio
                 if (completeForm.ShowDialog() == DialogResult.OK)
                 {
                     DateTime completionDate = completionDatePicker.Value;
-                    int rating = (int)ratingNumeric.Value;
+                    int? rating = (int?)ratingNumeric.Value;  // Cast to nullable int
                     string notes = notesTextBox.Text.Trim();
                     
                     _bookTracker.CompleteBook(bookId, completionDate, rating, notes);
@@ -1103,21 +1239,27 @@ namespace Studio
         
         private void SearchBooks(string searchTerm, DataGridView grid)
         {
-            if (string.IsNullOrWhiteSpace(searchTerm))
+            if (grid != null)
             {
-                RefreshBookData(grid);
-            }
-            else
-            {
-                grid.DataSource = null;
-                grid.DataSource = _bookTracker.SearchBooks(searchTerm);
+                if (string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    RefreshBookData(grid);
+                }
+                else
+                {
+                    grid.DataSource = null;
+                    grid.DataSource = _bookTracker.SearchBooks(searchTerm);
+                }
             }
         }
         
         private void RefreshBookData(DataGridView grid)
         {
-            grid.DataSource = null;
-            grid.DataSource = _bookTracker.GetAllBooks();
+            if (grid != null)
+            {
+                grid.DataSource = null;
+                grid.DataSource = _bookTracker.GetAllBooks();
+            }
         }
     }
 }

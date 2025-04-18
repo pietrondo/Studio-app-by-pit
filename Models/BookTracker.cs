@@ -7,12 +7,12 @@ namespace Studio
     public class Book
     {
         public int Id { get; set; }
-        public string Title { get; set; }
-        public string Author { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string Author { get; set; } = string.Empty;
         public DateTime StartDate { get; set; }
         public DateTime? CompletionDate { get; set; }
         public int? Rating { get; set; }
-        public string Notes { get; set; }
+        public string Review { get; set; } = string.Empty;
 
         public Book(int id, string title, string author, DateTime startDate)
         {
@@ -22,7 +22,7 @@ namespace Studio
             StartDate = startDate;
             CompletionDate = null;
             Rating = null;
-            Notes = string.Empty;
+            Review = string.Empty;
         }
     }
 
@@ -48,7 +48,7 @@ namespace Studio
         // Metodo per modificare un libro
         public bool EditBook(int bookId, string newTitle, string newAuthor, DateTime newStartDate)
         {
-            Book book = _books.Find(b => b.Id == bookId);
+            Book? book = _books.Find(b => b.Id == bookId);
             if (book != null)
             {
                 book.Title = newTitle;
@@ -62,7 +62,7 @@ namespace Studio
         // Metodo per rimuovere un libro
         public bool RemoveBook(int bookId)
         {
-            Book book = _books.Find(b => b.Id == bookId);
+            Book? book = _books.Find(b => b.Id == bookId);
             if (book != null)
             {
                 _books.Remove(book);
@@ -72,14 +72,14 @@ namespace Studio
         }
 
         // Metodo per segnare un libro come completato
-        public bool CompleteBook(int bookId, DateTime completionDate, int rating = 0, string notes = "")
+        public bool CompleteBook(int bookId, DateTime completionDate, int? rating = null, string review = "")
         {
-            Book book = _books.Find(b => b.Id == bookId);
+            Book? book = _books.Find(b => b.Id == bookId);
             if (book != null)
             {
                 book.CompletionDate = completionDate;
-                book.Rating = rating;
-                book.Notes = notes;
+                book.Rating = rating;  // No conversion needed since both are int?
+                book.Review = review;
                 return true;
             }
             return false;
@@ -92,7 +92,7 @@ namespace Studio
             return _books.FindAll(b => 
                 b.Title.ToLower().Contains(searchTerm) || 
                 b.Author.ToLower().Contains(searchTerm) || 
-                (b.Notes != null && b.Notes.ToLower().Contains(searchTerm))
+                b.Review.ToLower().Contains(searchTerm)
             );
         }
 

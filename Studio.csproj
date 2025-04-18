@@ -6,6 +6,9 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <!-- Aggiunto per sopprimere temporaneamente i warning relativi ai null durante lo sviluppo -->
+    <WarningsAsErrors>CS8600;CS8602;CS8604;CS8605</WarningsAsErrors>
   </PropertyGroup>
 
 </Project>

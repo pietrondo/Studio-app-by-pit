@@ -7,9 +7,9 @@ namespace Studio
     public class Exam
     {
         public int Id { get; set; }
-        public string Subject { get; set; }
+        public string Subject { get; set; } = string.Empty;
         public DateTime ExamDate { get; set; }
-        public string Location { get; set; }
+        public string Location { get; set; } = string.Empty;
         public bool IsPassed { get; set; }
         public int? Score { get; set; }
 
@@ -46,7 +46,7 @@ namespace Studio
         // Metodo per modificare un esame
         public bool EditExam(int examId, string newSubject, DateTime newExamDate, string newLocation)
         {
-            Exam exam = _exams.Find(e => e.Id == examId);
+            Exam? exam = _exams.Find(e => e.Id == examId);
             if (exam != null)
             {
                 exam.Subject = newSubject;
@@ -60,7 +60,7 @@ namespace Studio
         // Metodo per rimuovere un esame
         public bool RemoveExam(int examId)
         {
-            Exam exam = _exams.Find(e => e.Id == examId);
+            Exam? exam = _exams.Find(e => e.Id == examId);
             if (exam != null)
             {
                 _exams.Remove(exam);
@@ -72,7 +72,7 @@ namespace Studio
         // Metodo per registrare il risultato di un esame
         public bool RecordExamResult(int examId, bool isPassed, int? score)
         {
-            Exam exam = _exams.Find(e => e.Id == examId);
+            Exam? exam = _exams.Find(e => e.Id == examId);
             if (exam != null)
             {
                 exam.IsPassed = isPassed;

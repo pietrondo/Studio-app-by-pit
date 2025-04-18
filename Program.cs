@@ -1,16 +1,16 @@
 using System;
-using System.Windows.Forms;
+using System.Windows;
 
 namespace Studio
 {
-    static class Program
+    public class Program
     {
         [STAThread]
-        static void Main()
+        public static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm());
+            var application = new System.Windows.Application();
+            application.StartupUri = new Uri("MainWindow.xaml", UriKind.Relative);
+            application.Run();
         }
     }
 }

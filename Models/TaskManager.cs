@@ -7,7 +7,7 @@ namespace Studio
     public class Task
     {
         public int Id { get; set; }
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
         public DateTime DueDate { get; set; }
         public Priority Priority { get; set; }
         public bool IsCompleted { get; set; }
@@ -52,7 +52,7 @@ namespace Studio
         // Metodo per modificare una task
         public bool EditTask(int taskId, string newDescription, DateTime newDueDate, Priority newPriority)
         {
-            Task task = _tasks.Find(t => t.Id == taskId);
+            Task? task = _tasks.Find(t => t.Id == taskId);
             if (task != null)
             {
                 task.Description = newDescription;
@@ -66,7 +66,7 @@ namespace Studio
         // Metodo per rimuovere una task
         public bool RemoveTask(int taskId)
         {
-            Task task = _tasks.Find(t => t.Id == taskId);
+            Task? task = _tasks.Find(t => t.Id == taskId);
             if (task != null)
             {
                 _tasks.Remove(task);
@@ -78,7 +78,7 @@ namespace Studio
         // Metodo per segnare una task come completata
         public bool CompleteTask(int taskId)
         {
-            Task task = _tasks.Find(t => t.Id == taskId);
+            Task? task = _tasks.Find(t => t.Id == taskId);
             if (task != null)
             {
                 task.IsCompleted = true;

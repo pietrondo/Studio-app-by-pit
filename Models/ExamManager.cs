@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO; // Aggiunto per I/O file
+using System.Text.Json; // Aggiunto per JSON
 
 namespace Studio
 {
@@ -28,11 +30,13 @@ namespace Studio
     {
         private List<Exam> _exams;
         private int _nextId;
+        private const string FilePath = "exams.json"; // Percorso file dati
 
         public ExamManager()
         {
             _exams = new List<Exam>();
             _nextId = 1;
+            LoadData(); // Carica i dati all'inizializzazione
         }
 
         // Metodo per aggiungere un esame
@@ -104,6 +108,55 @@ namespace Studio
         public List<Exam> GetPassedExams()
         {
             return _exams.FindAll(e => e.IsPassed);
+        }
+
+        // Metodo per salvare i dati su file JSON
+        public void SaveData()
+        {
+            try
+            {
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                string jsonString = JsonSerializer.Serialize(_exams, options);
+                File.WriteAllText(FilePath, jsonString);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Errore durante il salvataggio degli esami: {ex.Message}");
+            }
+        }
+
+        // Metodo per caricare i dati da file JSON
+        private void LoadData()
+        {
+            if (!File.Exists(FilePath))
+            {
+                _exams = new List<Exam>();
+                _nextId = 1;
+                return;
+            }
+
+            try
+            {
+                string jsonString = File.ReadAllText(FilePath);
+                var loadedExams = JsonSerializer.Deserialize<List<Exam>>(jsonString);
+
+                if (loadedExams != null)
+                {
+                    _exams = loadedExams;
+                    _nextId = _exams.Any() ? _exams.Max(e => e.Id) + 1 : 1;
+                }
+                 else
+                {
+                     _exams = new List<Exam>();
+                     _nextId = 1;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Errore durante il caricamento degli esami: {ex.Message}");
+                _exams = new List<Exam>();
+                _nextId = 1;
+            }
         }
     }
 }

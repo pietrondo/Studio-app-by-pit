@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO; // Aggiunto per I/O file
+using System.Text.Json; // Aggiunto per JSON
 
 namespace Studio
 {
@@ -30,11 +32,13 @@ namespace Studio
     {
         private List<Book> _books;
         private int _nextId;
+        private const string FilePath = "books.json"; // Percorso file dati
 
         public BookTracker()
         {
             _books = new List<Book>();
             _nextId = 1;
+            LoadData(); // Carica i dati all'inizializzazione
         }
 
         // Metodo per aggiungere un libro
@@ -112,6 +116,55 @@ namespace Studio
         public List<Book> GetCurrentlyReadingBooks()
         {
             return _books.FindAll(b => !b.CompletionDate.HasValue);
+        }
+
+        // Metodo per salvare i dati su file JSON
+        public void SaveData()
+        {
+            try
+            {
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                string jsonString = JsonSerializer.Serialize(_books, options);
+                File.WriteAllText(FilePath, jsonString);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Errore durante il salvataggio dei libri: {ex.Message}");
+            }
+        }
+
+        // Metodo per caricare i dati da file JSON
+        private void LoadData()
+        {
+            if (!File.Exists(FilePath))
+            {
+                _books = new List<Book>();
+                _nextId = 1;
+                return;
+            }
+
+            try
+            {
+                string jsonString = File.ReadAllText(FilePath);
+                var loadedBooks = JsonSerializer.Deserialize<List<Book>>(jsonString);
+
+                if (loadedBooks != null)
+                {
+                    _books = loadedBooks;
+                    _nextId = _books.Any() ? _books.Max(b => b.Id) + 1 : 1;
+                }
+                 else
+                {
+                     _books = new List<Book>();
+                     _nextId = 1;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Errore durante il caricamento dei libri: {ex.Message}");
+                _books = new List<Book>();
+                _nextId = 1;
+            }
         }
     }
 }

@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using System.IO; // Aggiunto per I/O file
+using System.Text.Json; // Aggiunto per JSON
+using System.Linq; // Aggiunto per Max()
 
 namespace Studio
 {
@@ -34,11 +37,13 @@ namespace Studio
     {
         private List<Task> _tasks;
         private int _nextId;
+        private const string FilePath = "tasks.json"; // Percorso file dati
 
         public TaskManager()
         {
             _tasks = new List<Task>();
             _nextId = 1;
+            LoadData(); // Carica i dati all'inizializzazione
         }
 
         // Metodo per aggiungere una task
@@ -104,6 +109,60 @@ namespace Studio
         {
             DateTime cutoffDate = DateTime.Now.AddDays(days);
             return _tasks.FindAll(t => !t.IsCompleted && t.DueDate <= cutoffDate);
+        }
+
+        // Metodo per salvare i dati su file JSON
+        public void SaveData()
+        {
+            try
+            {
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                string jsonString = JsonSerializer.Serialize(_tasks, options);
+                File.WriteAllText(FilePath, jsonString);
+            }
+            catch (Exception ex)
+            {
+                // Gestione eccezioni (es. log, messaggio utente)
+                Console.WriteLine($"Errore durante il salvataggio delle task: {ex.Message}");
+                // Potresti voler mostrare un messaggio all'utente qui
+            }
+        }
+
+        // Metodo per caricare i dati da file JSON
+        private void LoadData()
+        {
+            if (!File.Exists(FilePath))
+            {
+                _tasks = new List<Task>(); // Inizia con lista vuota se il file non esiste
+                _nextId = 1;
+                return;
+            }
+
+            try
+            {
+                string jsonString = File.ReadAllText(FilePath);
+                var loadedTasks = JsonSerializer.Deserialize<List<Task>>(jsonString);
+
+                if (loadedTasks != null)
+                {
+                    _tasks = loadedTasks;
+                    // Aggiorna _nextId basandosi sull'ID massimo caricato + 1
+                    _nextId = _tasks.Any() ? _tasks.Max(t => t.Id) + 1 : 1;
+                }
+                else
+                {
+                     _tasks = new List<Task>(); // Inizializza se la deserializzazione fallisce
+                     _nextId = 1;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Gestione eccezioni (es. file corrotto, problemi di permessi)
+                Console.WriteLine($"Errore durante il caricamento delle task: {ex.Message}");
+                _tasks = new List<Task>(); // Inizia con lista vuota in caso di errore
+                _nextId = 1;
+                 // Potresti voler mostrare un messaggio all'utente qui
+            }
         }
     }
 }

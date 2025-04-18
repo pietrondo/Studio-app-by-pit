@@ -114,6 +114,11 @@ namespace Studio
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
+            // Salva sempre i dati prima di decidere se chiudere o nascondere
+            _taskManager.SaveData();
+            _examManager.SaveData();
+            _bookTracker.SaveData();
+
             // Se la chiusura non è esplicita (dal menu tray), annulla la chiusura
             // e nascondi la finestra invece di chiudere l'app.
             if (!_isExplicitClose)
@@ -240,6 +245,7 @@ namespace Studio
             {
                 // Aggiungi la task e aggiorna la DataGrid
                 _taskManager.AddTask(dialog.TaskDescription, dialog.DueDate, dialog.Priority);
+                _taskManager.SaveData(); // Salva i dati
                 RefreshTaskData();
                 
                 // Mostra notifica di conferma
@@ -260,6 +266,7 @@ namespace Studio
                 {
                     // Modifica la task e aggiorna la DataGrid
                     _taskManager.EditTask(selectedTask.Id, dialog.TaskDescription, dialog.DueDate, dialog.Priority);
+                    _taskManager.SaveData(); // Salva i dati
                     RefreshTaskData();
                     
                     // Mostra notifica di conferma
@@ -286,6 +293,7 @@ namespace Studio
                 if (result == MessageBoxResult.Yes)
                 {
                     _taskManager.RemoveTask(selectedTask.Id);
+                    _taskManager.SaveData(); // Salva i dati
                     RefreshTaskData();
                     
                     // Mostra notifica di conferma
@@ -304,6 +312,7 @@ namespace Studio
             if (selectedTask != null)
             {
                 _taskManager.CompleteTask(selectedTask.Id);
+                _taskManager.SaveData(); // Salva i dati
                 RefreshTaskData();
                 
                 // Mostra notifica di conferma
@@ -335,6 +344,7 @@ namespace Studio
             {
                 // Aggiungi l'esame e aggiorna la DataGrid
                 _examManager.AddExam(dialog.Subject, dialog.ExamDate, dialog.Location);
+                _examManager.SaveData(); // Salva i dati
                 RefreshExamData();
                 
                 // Mostra notifica di conferma
@@ -355,6 +365,7 @@ namespace Studio
                 {
                     // Modifica l'esame e aggiorna la DataGrid
                     _examManager.EditExam(selectedExam.Id, dialog.Subject, dialog.ExamDate, dialog.Location);
+                    _examManager.SaveData(); // Salva i dati
                     RefreshExamData();
                     
                     // Mostra notifica di conferma
@@ -381,6 +392,7 @@ namespace Studio
                 if (result == MessageBoxResult.Yes)
                 {
                     _examManager.RemoveExam(selectedExam.Id);
+                    _examManager.SaveData(); // Salva i dati
                     RefreshExamData();
                     
                     // Mostra notifica di conferma
@@ -406,6 +418,7 @@ namespace Studio
                 {
                     // Registra il risultato dell'esame e aggiorna la DataGrid
                     _examManager.RecordExamResult(selectedExam.Id, dialog.IsPassed, (int?)dialog.Score);
+                    _examManager.SaveData(); // Salva i dati
                     RefreshExamData();
                     
                     // Mostra notifica di conferma
@@ -438,6 +451,7 @@ namespace Studio
             {
                 // Aggiungi il libro e aggiorna la DataGrid
                 _bookTracker.AddBook(dialog.Title, dialog.Author, dialog.StartDate);
+                _bookTracker.SaveData(); // Salva i dati
                 RefreshBookData();
                 
                 // Mostra notifica di conferma
@@ -458,6 +472,7 @@ namespace Studio
                 {
                     // Modifica il libro e aggiorna la DataGrid
                     _bookTracker.EditBook(selectedBook.Id, dialog.Title, dialog.Author, dialog.StartDate);
+                    _bookTracker.SaveData(); // Salva i dati
                     RefreshBookData();
                     
                     // Mostra notifica di conferma
@@ -484,6 +499,7 @@ namespace Studio
                 if (result == MessageBoxResult.Yes)
                 {
                     _bookTracker.RemoveBook(selectedBook.Id);
+                    _bookTracker.SaveData(); // Salva i dati
                     RefreshBookData();
                     
                     // Mostra notifica di conferma
@@ -514,6 +530,7 @@ namespace Studio
                         dialog.Rating,
                         dialog.Review
                     );
+                    _bookTracker.SaveData(); // Salva i dati
                     RefreshBookData();
                     
                     // Mostra notifica di conferma

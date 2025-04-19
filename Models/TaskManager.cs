@@ -164,5 +164,18 @@ namespace Studio
                  // Potresti voler mostrare un messaggio all'utente qui
             }
         }
+
+        // Aggiorna una task esistente (sovrascrive i dati della task con lo stesso Id)
+        public bool UpdateTask(Task updatedTask)
+        {
+            var idx = _tasks.FindIndex(t => t.Id == updatedTask.Id);
+            if (idx >= 0)
+            {
+                _tasks[idx] = updatedTask;
+                SaveData();
+                return true;
+            }
+            return false;
+        }
     }
 }

@@ -110,6 +110,19 @@ namespace Studio
             return _exams.FindAll(e => e.IsPassed);
         }
 
+        // Aggiorna un esame esistente (sovrascrive i dati dell'esame con lo stesso Id)
+        public bool UpdateExam(Exam updatedExam)
+        {
+            var idx = _exams.FindIndex(e => e.Id == updatedExam.Id);
+            if (idx >= 0)
+            {
+                _exams[idx] = updatedExam;
+                SaveData();
+                return true;
+            }
+            return false;
+        }
+
         // Metodo per salvare i dati su file JSON
         public void SaveData()
         {

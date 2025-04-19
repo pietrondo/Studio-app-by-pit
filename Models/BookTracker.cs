@@ -118,6 +118,19 @@ namespace Studio
             return _books.FindAll(b => !b.CompletionDate.HasValue);
         }
 
+        // Aggiorna un libro esistente (sovrascrive i dati del libro con lo stesso Id)
+        public bool UpdateBook(Book updatedBook)
+        {
+            var idx = _books.FindIndex(b => b.Id == updatedBook.Id);
+            if (idx >= 0)
+            {
+                _books[idx] = updatedBook;
+                SaveData();
+                return true;
+            }
+            return false;
+        }
+
         // Metodo per salvare i dati su file JSON
         public void SaveData()
         {

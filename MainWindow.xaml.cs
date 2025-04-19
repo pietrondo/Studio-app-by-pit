@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Forms; // Aggiunto per NotifyIcon e ContextMenuStrip
 using System.Drawing; // Aggiunto per Icon
+using Studio.ViewModels; // Aggiungi using per i ViewModel
 
 namespace Studio
 {
@@ -13,6 +14,7 @@ namespace Studio
         private TaskManager _taskManager;
         private ExamManager _examManager;
         private BookTracker _bookTracker;
+        private DashboardViewModel _dashboardViewModel; // Aggiungi il ViewModel della Dashboard
         
         // Risorse per i temi
         private SolidColorBrush _lightBackground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(242, 242, 242));
@@ -24,7 +26,7 @@ namespace Studio
         private SolidColorBrush _secondaryBackgroundLight = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 255, 255));
         private SolidColorBrush _secondaryBackgroundDark = new SolidColorBrush(System.Windows.Media.Color.FromRgb(30, 30, 33));
 
-        private NotifyIcon _notifyIcon;
+        private NotifyIcon? _notifyIcon; // Rendi nullable
         private bool _isExplicitClose = false; // Flag per gestire la chiusura effettiva
 
         public MainWindow()
@@ -35,6 +37,10 @@ namespace Studio
             _taskManager = new TaskManager();
             _examManager = new ExamManager();
             _bookTracker = new BookTracker();
+
+            // Istanzia e imposta il ViewModel della Dashboard
+            _dashboardViewModel = new DashboardViewModel(_taskManager, _examManager, _bookTracker);
+            this.DataContext = _dashboardViewModel; // Imposta il DataContext della finestra
 
             InitializeNotifyIcon();
         }

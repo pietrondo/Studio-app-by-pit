@@ -5,6 +5,7 @@ namespace Studio
 {
     public class Program
     {
+        /* // Commentato per usare l'avvio WPF da App.xaml
         [STAThread]
         public static void Main()
         {
@@ -12,5 +13,6 @@ namespace Studio
             application.StartupUri = new Uri("MainWindow.xaml", UriKind.Relative);
             application.Run();
         }
+        */
     }
 }

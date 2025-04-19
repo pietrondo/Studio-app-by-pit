@@ -18,3 +18,4 @@ C:\Users\pietr\progetti\app-studio\Studio\obj\Debug\net9.0-windows\Studio_Markup
 C:\Users\pietr\progetti\app-studio\Studio\obj\Debug\net9.0-windows\Studio_MarkupCompile.lref
 C:\Users\pietr\progetti\app-studio\Studio\obj\Debug\net9.0-windows\MainWindow.baml
 C:\Users\pietr\progetti\app-studio\Studio\obj\Debug\net9.0-windows\Studio.g.resources
+C:\Users\pietr\progetti\app-studio\Studio\obj\Debug\net9.0-windows\App.g.cs
